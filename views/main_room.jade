@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    .page-header
+      h1 Debility_Chat
+
+      = user.name + 'がログイン中'
+      a(href='/logut')
+        button.btn.btn-success(type="button") Create Room
+    .hero-unit
+      .input-append
+        input#message.span5(type='text', placeholder='入力してください')
+        button.btn.btn-primary(type='button', onclick="send('#{user.name}')") 送信
+      #chat-area(style='height: 300px; overflow: scroll;')
+
+    a(href='/logout')
+        button.btn.btn-primary(type="button", style="margin-top: 2em") Logout
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
+    script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='/javascripts/chat.js')
+
