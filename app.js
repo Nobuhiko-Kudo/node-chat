@@ -2,6 +2,8 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var mongo = require('mongoose');
+var redis = require('redis');
+var client_redis = redis.createClient();
 var io = require('socket.io');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -20,10 +22,7 @@ var getHash = function(value) {
     return sha.digest('hex');
 };
 
-
 //シリアライズの設定
-
-
 passport.serializeUser(function(user, done){
     done(null, {email: user.email, _id: user._id});
 });
@@ -63,16 +62,6 @@ var io = io.listen(server);
 var message = require('./models/message');
 var user = require('./models/user');
 
-/*
- * if(user.count({}) == 0){
-    var aaaUser = new user();
-    aaaUser.name = "aaa";
-    aaaUser.email = "aaa@example.com";
-    aaaUser.password = getHash("aaa");
-    aaaUser.save();
-}
-*/
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -85,18 +74,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser('secret'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-
 app.use('/', main_room);
 app.use('/users', users);
 app.use('/login', login);
 app.use('/logout', logout);
-
-//passport.use(new LocalStrategy(User.authenticate()));
-
-//シリアライズの設定
-//passport.serializeUser(User.serializeUser());
-//passport.deserializeUser(User.deserializeUser());
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
@@ -154,7 +135,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
-console.log('aaa');
+//再起動時は、ログインユーザーの記録を削除する。
+client_redis.del('login_users');
 server.listen(5555)
 io.sockets.on('connection', function(socket) {
 

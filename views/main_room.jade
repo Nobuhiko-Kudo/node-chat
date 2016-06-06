@@ -4,8 +4,10 @@ block content
     .page-header
       h1 Debility_Chat
 
-      = user.name + 'がログイン中'
-      a(href='/logut')
+      dev.pull-right
+        = login_users + 'がログイン中'
+      
+      a(href='/logout')
         button.btn.btn-success(type="button") Create Room
     .hero-unit
       .input-append
